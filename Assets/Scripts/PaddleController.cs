@@ -16,7 +16,7 @@ public class PaddleController : MonoBehaviour
     public void OnMove(InputValue movementValue)
     {
         Vector2 movementVector = movementValue.Get<Vector2>();
-        movementY = movementVector.y;
+        movementY = movementVector.x;
     }
 
     // Update is called once per frame
