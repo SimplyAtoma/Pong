@@ -75,7 +75,7 @@ public class Ball : MonoBehaviour
     {
         if (collision.collider.CompareTag("Paddle"))
         {
-            speed= speed + 1;
+            speed = speed * 1.2f;
             BounceOffPaddle(collision);
         }
         else
