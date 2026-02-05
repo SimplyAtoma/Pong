@@ -1,8 +1,15 @@
 using UnityEngine;
+using TMPro;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Ball : MonoBehaviour
 {
+    public TextMeshProUGUI ScoreText;
+    public int P1Score;
+    public int P2Score;
+    private bool p1Serve;
+    private bool p2Serve;
+    public GameObject winTextObject;    
     [Header("Movement")]
     public float speed = 8f;
 
@@ -32,6 +39,8 @@ public class Ball : MonoBehaviour
 
     void Start()
     {
+        winTextObject.SetActive(false);
+        SetScoreText();
         ServeRandom();
     }
 
@@ -39,6 +48,45 @@ public class Ball : MonoBehaviour
     {
         rb.linearVelocity = Vector3.zero;
         Invoke(nameof(DoServe), serveDelay);
+    }
+
+    public void ServeLoser()
+    {
+        rb.linearVelocity = Vector3.zero;
+        if (p1Serve)
+        {
+            Invoke(nameof(ServeP1), serveDelay);
+            p1Serve = false;
+            p2Serve = false;
+        }
+        else if (p2Serve)
+        {
+            Invoke(nameof(ServeP2), serveDelay);
+            p2Serve = false;
+            p1Serve = false;
+        }
+        else
+        {
+            Invoke(nameof(DoServe), serveDelay);
+        }
+    }
+
+    void ServeP1()
+    {
+        // Serve towards the player who just lost
+        float dirX = rb.position.x < 0f ? -1f : 1f;
+
+        // Small random angle variation
+        float angle = Random.Range(-15f, 15f);
+        Vector3 dir = Quaternion.Euler(0f, 0f, angle) * new Vector3(-1f, 0f, 0f);
+        rb.linearVelocity = dir.normalized * speed;
+    }
+    void ServeP2()
+    {
+        // Small random angle variation
+        float angle = Random.Range(-15f, 15f);
+        Vector3 dir = Quaternion.Euler(0f, 0f, angle) * new Vector3(1f, 0f, 0f);
+        rb.linearVelocity = dir.normalized * speed;
     }
 
     void DoServe()
@@ -77,6 +125,30 @@ public class Ball : MonoBehaviour
         {
             speed = speed * 1.2f;
             BounceOffPaddle(collision);
+        }
+        else if (collision.collider.CompareTag("P1ScoreZone"))
+        {
+            // Scoring zone: reset speed and serve again
+            speed = 8f;
+            P1Score+=1;
+            Debug.Log("Player 1 Scored");
+            Debug.Log("Score: " + P1Score + " - " + P2Score);
+            SetScoreText();
+            transform.position = new Vector3(0f,0f,0f);
+            p2Serve = true;
+            ServeLoser();
+        }
+        else if (collision.collider.CompareTag("P2ScoreZone"))
+        {
+            // Scoring zone: reset speed and serve again
+            speed = 8f;
+            P2Score+=1;
+            Debug.Log("Player 2 Scored");
+            Debug.Log("Score: " + P1Score + " - " + P2Score);
+            SetScoreText();
+            transform.position = new Vector3(0f,0f,0f);
+            p1Serve = true;
+            ServeLoser();
         }
         else
         {
@@ -137,5 +209,25 @@ public class Ball : MonoBehaviour
         }
 
         return dir.normalized;
+    }
+        void SetScoreText()
+    { 
+        if(P1Score == 11)
+            {
+                winTextObject.SetActive(true);
+                Destroy(this.gameObject);
+                winTextObject.GetComponent<TextMeshProUGUI>().text = "Player 1 Wins!";
+                P1Score=0;
+                P2Score=0;
+            }
+            else if (P2Score == 11)
+            {
+                winTextObject.SetActive(true);
+                Destroy(this.gameObject);
+                winTextObject.GetComponent<TextMeshProUGUI>().text = "Player 2 Wins!";
+                P1Score=0;
+                P2Score=0;
+            }
+            ScoreText.text = P1Score.ToString() + " - " + P2Score.ToString();
     }
 }

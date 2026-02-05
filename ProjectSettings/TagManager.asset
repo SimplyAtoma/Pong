@@ -9,6 +9,8 @@ TagManager:
   - Wall
   - ScoreZone
   - ScoreText
+  - P1ScoreZone
+  - P2ScoreZone
   layers:
   - Default
   - TransparentFX
