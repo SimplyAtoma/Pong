@@ -7,6 +7,10 @@ public class Ball : MonoBehaviour
     public TextMeshProUGUI ScoreText;
     public int P1Score;
     public int P2Score;
+
+    public AudioClip bounceClip;
+    public AudioClip fastbounceClip;
+    public AudioClip scoreClip;
     private bool p1Serve;
     private bool p2Serve;
     public GameObject winTextObject;    
@@ -121,14 +125,25 @@ public class Ball : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
+
         if (collision.collider.CompareTag("Paddle"))
-        {
+        {   
+            if (speed <= 12f)
+            {
+            SoundFXManager.Instance.PlaySound(bounceClip, transform);
+            }
+            
+            else
+            {
+            SoundFXManager.Instance.PlaySound(fastbounceClip, transform);
+            }
             speed = speed * 1.2f;
             BounceOffPaddle(collision);
         }
         else if (collision.collider.CompareTag("P1ScoreZone"))
         {
             // Scoring zone: reset speed and serve again
+            SoundFXManager.Instance.PlaySound(scoreClip, transform);
             speed = 8f;
             P1Score+=1;
             Debug.Log("Player 1 Scored");
@@ -141,6 +156,7 @@ public class Ball : MonoBehaviour
         else if (collision.collider.CompareTag("P2ScoreZone"))
         {
             // Scoring zone: reset speed and serve again
+            SoundFXManager.Instance.PlaySound(scoreClip, transform);
             speed = 8f;
             P2Score+=1;
             Debug.Log("Player 2 Scored");
@@ -154,6 +170,7 @@ public class Ball : MonoBehaviour
         {
             // Walls: reflect using contact normal, then clamp.
             Vector3 reflected = Vector3.Reflect(rb.linearVelocity.normalized, collision.contacts[0].normal);
+            SoundFXManager.Instance.PlaySound(bounceClip, transform);
             reflected.z = 0f;
             rb.linearVelocity = ClampDirectionXY(reflected) * speed;
         }

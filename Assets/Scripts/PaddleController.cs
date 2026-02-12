@@ -6,16 +6,20 @@ public class PaddleController : MonoBehaviour
     [Header("Input Actions")]
     public InputActionAsset actions;
     public string actionMapName = "Gameplay";
-
-    [Tooltip("Set to P1Move or P2Move per paddle")]
     public string moveActionName = "P1Move";
 
     [Header("Movement")]
     public float moveSpeed = 8f;
     public float yLimit = 4f;
 
-    private Rigidbody rb;
-    private InputAction moveAction;
+    Rigidbody rb;
+    InputAction moveAction;
+
+    [Header("Camera Shake")]
+    public float baseShakeDuration = 0.2f;
+    public float maxShakeStrength = 0.6f;
+
+    public PerlinCameraShake camShake;
 
     void Awake()
     {
@@ -38,6 +42,13 @@ public class PaddleController : MonoBehaviour
         if (moveAction != null) moveAction.Disable();
     }
 
+    void Start()
+    {
+        camShake = Camera.main.GetComponent<PerlinCameraShake>();
+        if (camShake == null)
+            Debug.LogError("No PerlinCameraShake found on Camera.main. Add PerlinCameraShake to your Camera or CameraRig.");
+    }
+
     void FixedUpdate()
     {
         float input = moveAction.ReadValue<float>();
@@ -48,5 +59,15 @@ public class PaddleController : MonoBehaviour
         p.y = Mathf.Clamp(p.y, -yLimit, yLimit);
         p.z = 0f;
         transform.position = p;
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (camShake == null) return;
+
+        float impactForce = collision.relativeVelocity.magnitude;
+        float strength = Mathf.Clamp(impactForce * 0.1f, 0.1f, maxShakeStrength);
+
+        camShake.Shake(baseShakeDuration, strength);
     }
 }
