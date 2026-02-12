@@ -11,6 +11,8 @@ TagManager:
   - ScoreText
   - P1ScoreZone
   - P2ScoreZone
+  - PowerUpSpeedup
+  - PowerUpSpeeddown
   layers:
   - Default
   - TransparentFX

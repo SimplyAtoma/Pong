@@ -47,6 +47,18 @@ public class Ball : MonoBehaviour
         SetScoreText();
         ServeRandom();
     }
+    // void OnTriggerEnter(Collider pickup)
+    // {
+    //     if (pickup.gameObject.CompareTag("PickUpSpeedup"))
+    //     {
+    //         Destroy(pickup.gameObject);
+    //         speed = speed * 2.6f;
+    //     } else if (pickup.gameObject.CompareTag("PickUpSpeeddown"))
+    //     {
+    //         Destroy(pickup.gameObject);
+    //         speed = speed - 2f;
+    //     }
+    // }
 
     public void ServeRandom()
     {
@@ -152,6 +164,14 @@ public class Ball : MonoBehaviour
             transform.position = new Vector3(0f,0f,0f);
             p2Serve = true;
             ServeLoser();
+        }else if (collision.collider.CompareTag("PickUpSpeedup"))
+        {
+            Destroy(collision.gameObject);
+            speed = speed * 2.6f;
+        } else if (collision.collider.CompareTag("PickUpSpeeddown"))
+        {
+            Destroy(collision.gameObject);
+            speed = speed - 2f;
         }
         else if (collision.collider.CompareTag("P2ScoreZone"))
         {
